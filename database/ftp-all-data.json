@@ -1,0 +1,8 @@
+{
+    "Client-Data": {
+        "Client-Ftp-Name": "", "Client-Ports-Accepteds": [], "root-password": ""
+    }, 
+    "Server-Data": {
+        "Sever-Ftp-Name": "", "Server-Ports-Accepteds": [], "root-password": ""
+    }
+}

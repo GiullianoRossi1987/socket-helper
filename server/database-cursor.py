@@ -3,6 +3,9 @@
 import sqlite3
 from typing import Type
 
+# todo: reescrever funcoes sem o @classmethod
+# influencia nos snippets, mas se n quiser n precisa
+
 
 class Database(object):
     con = sqlite3.Connection()
@@ -59,7 +62,7 @@ class IpsStandarts(Database):
         return False
     
     @classmethod
-    def add_addr(cls, data: list):
+    def add_ip(cls, data: list):
         if cls.ip_exists(data[:1]): 
             raise cls.IpExistsError()
         a = cls.cursor.execute("insert into tb_ips_std (Host_Ip, port, Action_To_Server) values (?,?,?);", data)
@@ -67,14 +70,14 @@ class IpsStandarts(Database):
         del a 
 
     @classmethod
-    def del_addr(cls, addr: list):
+    def del_ip(cls, addr: list):
         if not cls.ip_exists(addr): raise cls.IpNotFound()
         a = cls.cursor.execute(f"delete from tb_ips_std where Host_Ip = '{addr[0]}' and port = {addr[1]};")
         del a 
         cls.con.commit()
     
     @classmethod
-    def alt_addr(cls, addr: list, camp_alt: str, vl):
+    def alt_ip(cls, addr: list, camp_alt: str, vl):
         if not cls.ip_exists(addr): raise cls.IpNotFound()
         if vl is str:
             a = cls.cursor.execute(f"update tb_ips_std set {camp_alt} = '{vl}' where Host_Ip = '{addr[0]}' and port = {addr[1]};")
@@ -85,12 +88,45 @@ class IpsStandarts(Database):
 
 class AddrsServer(Database):
 
-    class AddrExistsError(Exception): 
-        args = "This address already exists in database"
+    class AddrExistsError(Exception):  args = "This address already exists in database"
     
-    class AddrNotFound(Exception):
-        args = "This address not exists in database"
+    class AddrNotFound(Exception): args = "This address not exists in database"
     
+    @classmethod
+    def addr_exists(cls, addr: list):
+        c = cls.cursor.execute("select Host, port from tb_addrs_server;")
+        for i in c.fetchall():
+            if i[0] == addr[0] and i[1] == addr[1]: return True
+        del c 
+        return False
+    
+    @classmethod
+    def add_addr(cls, addr: list):
+        if cls.add_addr(addr): raise cls.AddrExistsError()
+        a = cls.cursor.execute(f"insert into tb_addrs_server (Host, port) values ('{addr[0]}', {addr[1]});")
+        cls.con.commit()
+        del a 
+    
+    @classmethod
+    def del_addr(cls, addr: list):
+        if not cls.addr_exists(addr): raise cls.AddrNotFound()
+        c = cls.cursor.execute(f"delete from tb_addrs_server where Host = '{addr[0]}' and port = {addr[1]};")
+        cls.con.commit()
+        del c 
+    
+    @classmethod
+    def alt_addr(cls, addr: str, camp: str, vl_new):
+        if not cls.addr_exists(addr): raise cls.AddrNotFound()
+        if camp == "Host":
+            a = cls.cursor.execute(f"update tb_addrs_server set {camp} = '{vl_new}' where Host = '{addr[0]}' and port = {addr[1]};")
+        elif camp == "port":
+            a = cls.cursor.execute(f"update tb_addrs_server set {camp} = {vl_new} where Host = '{addr[0]}' and port = {addr[1]};")
+        else: raise IndexError("No such camp "+camp+" in database")
+        del a 
+        cls.con.commit()
+    
+
+
 
 
 

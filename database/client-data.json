@@ -1,0 +1,5 @@
+{
+    "ClientName": "",
+    "StdPorts": [],
+    "StdDatabase": "${pwd}/database/database-server.db"
+}
