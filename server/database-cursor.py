@@ -1,14 +1,13 @@
 # coding = utf-8
 # using namespace std
 import sqlite3
-from typing import Type
 
 # todo: reescrever funcoes sem o @classmethod
 # influencia nos snippets, mas se n quiser n precisa
 
 
 class Database(object):
-    con = sqlite3.Connection()
+    con = sqlite3.connect("../database/database-server.db")
     cursor = con.cursor()
 
     def __init__(self):
